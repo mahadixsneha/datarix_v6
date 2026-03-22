@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datarix — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+<style>
+:root{--bg:#07070d;--s1:#0f0f1a;--s2:#161624;--border:#1e1e30;--accent:#6366f1;--accent2:#3ecf8e;--danger:#f25f5c;--warn:#f4a261;--text:#e8e8f2;--muted:#52527a;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+[data-theme="light"]{--bg:#f8fafc;--s1:#ffffff;--s2:#f1f5f9;--border:#e2e8f0;--text:#1e293b;--muted:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s}
+.ms{font-family:'Material Symbols Outlined';font-size:20px;vertical-align:middle;font-weight:300;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}
+.sidebar{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform 0.3s}
+.logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-text{font-family:var(--mono);font-size:14px;font-weight:700}
+.logo-text span{color:var(--accent)}
+.nav{flex:1;padding:10px 8px;overflow-y:auto}
+.nav-sec{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;padding:8px 10px 4px;font-family:var(--mono)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;transition:all 0.15s;margin-bottom:1px;border:1px solid transparent}
+.nav-item:hover{background:var(--s2);color:var(--text)}
+.nav-item.active{background:rgba(99,102,241,0.12);color:var(--accent);border-color:rgba(99,102,241,0.18)}
+.nav-item .ms{font-size:17px}
+.tbl-nav{display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:7px;cursor:pointer;color:var(--muted);font-size:12px;transition:all 0.15s;margin-bottom:1px}
+.tbl-nav:hover,.tbl-nav.active{background:var(--s2);color:var(--accent2)}
+.tbl-dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+.sb-foot{padding:10px 12px;border-top:1px solid var(--border)}
+.user-chip{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:var(--s2);cursor:pointer}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+.uname{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uplan{font-size:10px;color:var(--muted)}
+.main{margin-left:230px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:50;padding:11px 22px;background:rgba(7,7,13,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+[data-theme="light"] .topbar{background:rgba(248,250,252,0.9)}
+.topbar-title{font-family:var(--mono);font-size:12px;color:var(--muted);flex:1}
+.topbar-title strong{color:var(--text)}
+.hamburger{display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);cursor:pointer;align-items:center}
+.lang-btns{display:flex;gap:4px}
+.lb{padding:3px 8px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);font-size:10.5px;cursor:pointer;font-family:var(--sans);transition:all 0.15s}
+.lb.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;font-size:12.5px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all 0.15s}
+.btn .ms{font-size:15px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#4f46e5;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--s2);color:var(--text)}
+.btn-danger{background:rgba(242,95,92,0.1);color:var(--danger);border:1px solid rgba(242,95,92,0.2)}
+.btn-danger:hover{background:rgba(242,95,92,0.2)}
+.btn-success{background:rgba(62,207,142,0.1);color:var(--accent2);border:1px solid rgba(62,207,142,0.2)}
+.btn-success:hover{background:rgba(62,207,142,0.2)}
+.btn-warn{background:rgba(244,162,97,0.1);color:var(--warn);border:1px solid rgba(244,162,97,0.2)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+.content{padding:22px;flex:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px}
+.stat{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:15px 17px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);margin-bottom:6px}
+.stat-val{font-family:var(--mono);font-size:24px;font-weight:700}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:32px;color:var(--accent);opacity:0.1}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.sec-title{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.tbl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:11px;margin-bottom:22px}
+.tcard{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px 16px;cursor:pointer;transition:all 0.2s;position:relative}
+.tcard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,0.1)}
+.tcard.sel{border-color:var(--accent);background:rgba(99,102,241,0.04)}
+.tcard-name{font-family:var(--mono);font-size:12.5px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.badge{font-size:9px;padding:2px 6px;border-radius:20px;font-family:var(--sans);font-weight:600;text-transform:uppercase;background:rgba(99,102,241,0.15);color:var(--accent)}.badge-col{background:rgba(62,207,142,0.15)!important;color:var(--accent2)!important}
+.tcard-meta{font-size:11.5px;color:var(--muted);margin-bottom:4px}
+.tcard-cols{font-size:10px;color:var(--muted);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcard-acts{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:opacity 0.15s}
+.tcard:hover .tcard-acts{opacity:1}
+.icon-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--border);background:var(--s2);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;transition:all 0.15s}
+.icon-btn:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.icon-btn.edit:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.icon-btn.dup:hover{background:var(--warn);color:#fff;border-color:var(--warn)}
+.add-tcard{background:transparent;border:1px dashed var(--border);border-radius:11px;padding:14px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:7px;color:var(--muted);font-size:12.5px;min-height:88px}
+.add-tcard:hover{border-color:var(--accent);color:var(--accent)}
+.data-panel{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:22px}
+.dp-hdr{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dp-title{font-family:var(--mono);font-size:12.5px;font-weight:700;flex:1;min-width:100px}
+.search-box{display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:5px 10px}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:12.5px;font-family:var(--sans);width:120px}
+.search-box input::placeholder{color:var(--muted)}
+.filter-bar{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--s2)}
+.filter-select{padding:5px 9px;background:var(--s1);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;outline:none;font-family:var(--sans)}
+.filter-input{padding:5px 9px;background:var(--s1);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;outline:none;font-family:var(--sans);width:130px}
+.tbl-wrap{overflow-x:auto}
+.dtable{width:100%;border-collapse:collapse;font-size:12.5px}
+.dtable th{text-align:left;padding:9px 13px;background:var(--s2);color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);font-weight:400;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+.dtable th:hover{color:var(--text)}
+.dtable th .ct{color:var(--accent);font-size:9px;display:block;margin-top:1px;text-transform:lowercase}
+.dtable td{padding:9px 13px;border-bottom:1px solid rgba(30,30,48,0.5);transition:background 0.1s;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.dtable tr:last-child td{border-bottom:none}
+.dtable tr:hover td{background:rgba(255,255,255,0.015)}
+.dtable td.id-col{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.dtable td.null-v{color:var(--muted);font-style:italic;font-size:11.5px}
+.row-acts{display:flex;gap:4px;opacity:0;transition:opacity 0.15s}
+.dtable tr:hover .row-acts{opacity:1}
+.row-check{margin-right:8px;cursor:pointer;accent-color:var(--accent)}
+.pagination{display:flex;align-items:center;gap:4px;padding:10px 16px;border-top:1px solid var(--border);flex-wrap:wrap}
+.pg-btn{width:27px;height:27px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:var(--mono)}
+.pg-btn:hover,.pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pg-info{font-size:11px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.empty-state{text-align:center;padding:44px 20px;color:var(--muted)}
+.bc{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);margin-bottom:14px;font-family:var(--mono)}
+.bc .sep{color:var(--border)}
+.bc .cur{color:var(--accent)}
+.bc span[onclick]{cursor:pointer}
+.bc span[onclick]:hover{color:var(--text)}
+.ann{border-radius:9px;padding:9px 14px;margin-bottom:16px;display:flex;align-items:center;gap:9px;font-size:12.5px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2)}
+/* PLAN BADGE */
+.plan-badge{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;text-transform:uppercase;font-family:var(--mono)}
+.plan-free{background:rgba(82,82,122,0.2);color:var(--muted)}
+.plan-pro{background:rgba(99,102,241,0.2);color:var(--accent)}
+.plan-business{background:rgba(62,207,142,0.2);color:var(--accent2)}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;padding:14px}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--s1);border:1px solid var(--border);border-radius:16px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;transform:scale(0.96) translateY(10px);transition:transform 0.2s}
+.modal-bg.open .modal{transform:scale(1) translateY(0)}
+.modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:1}
+.modal-title{font-family:var(--mono);font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.modal-close{width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.modal-close:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+.modal-body{padding:16px 20px}
+.fg{margin-bottom:12px}
+.fl{font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;display:block}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color 0.15s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+select.fi option{background:var(--s2)}
+textarea.fi{resize:vertical;min-height:80px;line-height:1.5}
+.mode-toggle{display:flex;background:var(--s2);border-radius:7px;padding:3px;margin-bottom:12px;gap:3px}
+.mode-btn{flex:1;padding:6px;border-radius:5px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.mode-btn .ms{font-size:14px}
+.mode-btn.active{background:var(--accent);color:#fff}
+.col-row{display:grid;grid-template-columns:1fr 100px 80px 28px;gap:6px;align-items:center;padding:7px 9px;background:var(--s2);border-radius:7px;margin-bottom:4px;border:1px solid var(--border)}
+.col-row.hdr{padding:4px 9px;border:none;background:transparent;margin-bottom:2px}
+.col-row.hdr span{font-size:9px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.5px}
+.remove-col{width:24px;height:24px;border-radius:5px;border:none;background:rgba(242,95,92,0.1);color:var(--danger);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.remove-col:hover{background:var(--danger);color:#fff}
+.add-col-btn{display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px dashed var(--border);border-radius:7px;background:none;color:var(--muted);font-size:12px;cursor:pointer;width:100%;font-family:var(--sans);transition:all 0.15s;margin-top:3px}
+.add-col-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.sql-editor{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;color:var(--accent2);font-size:11.5px;font-family:var(--mono);outline:none;resize:vertical;min-height:100px;line-height:1.6}
+.sql-editor:focus{border-color:var(--accent)}
+.modal-footer{display:flex;gap:8px;margin-top:6px}
+.modal-footer .btn{flex:1;justify-content:center}
+/* API KEY PANEL */
+.api-panel{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:14px}
+.api-panel-title{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.api-key-box{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 11px;margin-bottom:11px}
+.api-key-val{font-family:var(--mono);font-size:11px;color:var(--accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-btn{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:5px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-size:11px;cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:var(--sans)}
+.copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.copy-btn.copied{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.snippet-tabs{display:flex;gap:4px;margin-bottom:9px}
+.stab{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:var(--mono);transition:all 0.15s}
+.stab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:var(--mono);font-size:11px;color:#a5f3fc;line-height:1.7;overflow-x:auto;position:relative;white-space:pre}
+.code-copy{position:absolute;top:6px;right:6px}
+/* TABS in modal */
+.modal-tabs{display:flex;background:var(--s2);border-radius:7px;padding:3px;margin-bottom:14px;gap:3px}
+.mtab{flex:1;padding:6px;border-radius:5px;border:none;background:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all 0.15s}
+.mtab.active{background:var(--accent);color:#fff}
+.mtab-content{display:none}
+.mtab-content.active{display:block}
+/* CHART */
+.chart-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:22px}
+.chart-title{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:100px}
+.bar{flex:1;border-radius:4px 4px 0 0;background:var(--accent);opacity:0.7;transition:opacity 0.2s;cursor:pointer;position:relative;min-width:10px}
+.bar:hover{opacity:1}
+.bar-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);font-family:var(--mono);white-space:nowrap}
+/* TOAST */
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:12.5px;display:flex;align-items:center;gap:8px;transform:translateX(120px);opacity:0;transition:all 0.3s;min-width:190px;box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.success{border-left:3px solid var(--accent2)}
+.toast.error{border-left:3px solid var(--danger)}
+.toast.info{border-left:3px solid var(--accent)}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99}
+.spin{width:14px;height:14px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:sp 0.7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.support-fab{position:fixed;bottom:18px;left:18px;z-index:50;width:38px;height:38px;background:var(--s1);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--muted);text-decoration:none}
+.support-fab:hover{border-color:var(--accent2);color:var(--accent2)}
+/* BULK ACTIONS BAR */
+.bulk-bar{padding:9px 16px;background:rgba(99,102,241,0.08);border-bottom:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;gap:9px;display:none}
+.bulk-bar.show{display:flex}
+/* KEY LIST */
+.key-item{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.key-val{font-family:var(--mono);font-size:11px;color:var(--accent2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.key-meta{font-size:11px;color:var(--muted)}
+.perm-badge{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:600;margin-right:4px}
+.perm-read{background:rgba(62,207,142,0.15);color:var(--accent2)}
+.perm-write{background:rgba(99,102,241,0.15);color:var(--accent)}
+/* APP USERS */
+.appuser-item{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:9px}
+.role-badge{font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700;text-transform:uppercase}
+.role-admin{background:rgba(244,162,97,0.2);color:var(--warn)}
+.role-editor{background:rgba(99,102,241,0.2);color:var(--accent)}
+.role-user{background:rgba(82,82,122,0.2);color:var(--muted)}
+/* WEBHOOK */
+.webhook-item{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px;display:flex;align-items:center;gap:9px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sb-overlay.open{display:block}.main{margin-left:0}.hamburger{display:flex}.topbar{padding:9px 12px}.content{padding:12px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="sb-overlay" id="overlay" onclick="closeSb()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-icon"><span class="ms" style="color:#fff;font-size:16px">database</span></div>
+    <div class="logo-text">Data<span>rix</span></div>
+  </div>
+  <nav class="nav">
+    <div class="nav-sec" id="n-workspace">Workspace</div>
+    <div class="nav-item active" id="nav-home" onclick="showHome()"><span class="ms">grid_view</span><span id="n-overview">Overview</span></div>
+    <div class="nav-item" id="nav-tables" onclick="showHome()"><span class="ms">table_chart</span><span id="n-tables">Tables</span></div>
+    <div class="nav-item" id="nav-keys" onclick="openKeysModal()"><span class="ms">key</span><span id="n-apikeys">API Keys</span></div>
+    <div class="nav-item" id="nav-appusers" onclick="openAppUsersModal()"><span class="ms">group</span><span id="n-appusers">App Users</span></div>
+    <div class="nav-item" id="nav-webhooks" onclick="openWebhooksModal()"><span class="ms">webhook</span><span id="n-webhooks">Webhooks</span></div>
+    <div class="nav-item" id="nav-templates" onclick="openTemplatesModal()"><span class="ms">auto_awesome</span><span>Templates</span></div>
+    <div class="nav-item" id="nav-usage" onclick="openUsageModal()"><span class="ms">bar_chart</span><span id="n-usage">API Usage</span></div>
+    <div class="nav-sec" id="n-mytables" style="margin-top:8px">My Tables</div>
+    <div id="sb-tables"></div>
+  </nav>
+  <div class="sb-foot">
+    <div class="user-chip" onclick="openProfileModal()">
+      <div class="avatar" id="sb-avatar">?</div>
+      <div style="flex:1;overflow:hidden">
+        <div class="uname" id="sb-name">...</div>
+        <div class="uplan" id="sb-plan">Free</div>
+      </div>
+      <span class="ms" style="color:var(--muted);font-size:16px" onclick="event.stopPropagation();logout()">logout</span>
+    </div>
+  </div>
+</aside>
+
+<a class="support-fab" id="support-fab" href="#" target="_blank"><span class="ms">help</span></a>
+
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSb()"><span class="ms">menu</span></button>
+    <div class="topbar-title" id="topbar-title"><strong>Overview</strong></div>
+    <div class="lang-btns">
+      <button class="lb active" onclick="setLang('en')">EN</button>
+      <button class="lb" onclick="setLang('bn')">বাং</button>
+      <button class="lb" onclick="setLang('hi')">हिं</button>
+    </div>
+    <button class="btn btn-ghost" onclick="toggleTheme()" title="Theme"><span class="ms" id="theme-icon">dark_mode</span></button>
+    <button class="btn btn-primary" onclick="openCreateModal()"><span class="ms">add</span><span id="t-newtable">New Table</span></button>
+  </div>
+  <div class="content">
+    <div class="ann" id="ann" style="display:none"><span class="ms" style="color:var(--accent)">campaign</span><span id="ann-text"></span></div>
+    <!-- HOME -->
+    <div id="home-view">
+      <div class="stats">
+        <div class="stat"><div class="stat-label" id="t-totaltables">Total Tables</div><div class="stat-val" id="st-tables">—</div><div class="stat-sub" id="t-yourdbs">Your databases</div><span class="ms stat-icon">table_chart</span></div>
+        <div class="stat"><div class="stat-label" id="t-totalrows">Total Rows</div><div class="stat-val" id="st-rows">—</div><div class="stat-sub" id="t-allrows">Across all tables</div><span class="ms stat-icon">data_table</span></div>
+        <div class="stat"><div class="stat-label" id="t-plan">Plan</div><div class="stat-val" style="font-size:16px;margin-top:5px" id="st-plan">Free</div><div class="stat-sub" id="t-upgrade" style="cursor:pointer;color:var(--accent)" onclick="openPlansModal()">View plans →</div><span class="ms stat-icon">star</span></div>
+        <div class="stat"><div class="stat-label" id="t-apikeys">API Keys</div><div class="stat-val" id="st-keys">—</div><div class="stat-sub" style="cursor:pointer;color:var(--accent)" onclick="openKeysModal()" id="t-manage">Manage keys</div><span class="ms stat-icon">key</span></div>
+      </div>
+      <div class="sec-hdr"><div class="sec-title" id="t-yourtables">Your Tables</div><button class="btn btn-ghost" onclick="loadTables()"><span class="ms">refresh</span></button></div>
+      <div class="tbl-grid" id="tbl-grid"></div>
+    </div>
+    <!-- DATA VIEW -->
+    <div id="data-view" style="display:none">
+      <div class="bc"><span onclick="showHome()" id="t-bc-tables">Tables</span><span class="sep">›</span><span class="cur" id="dv-name"></span></div>
+      <div class="data-panel">
+        <div class="dp-hdr">
+          <div class="dp-title" id="dp-title"></div>
+          <div class="search-box"><span class="ms" style="font-size:14px;color:var(--muted)">search</span><input type="text" id="search-inp" oninput="doSearch()"></div>
+          <button class="btn btn-ghost" onclick="openColMgmtModal()" title="Manage Columns"><span class="ms">view_column</span></button>
+          <button class="btn btn-ghost" onclick="showFilterBar()" title="Filter"><span class="ms">filter_list</span></button>
+          <button class="btn btn-ghost" onclick="exportCSV()" title="Export CSV"><span class="ms">download</span></button>
+          <button class="btn btn-ghost" onclick="openImportModal()" title="Import CSV"><span class="ms">upload</span></button>
+          <button class="btn btn-ghost" onclick="openApiKeyModal()" title="API"><span class="ms">key</span></button>
+          <button class="btn btn-success" onclick="openInsertModal()"><span class="ms">add_row</span><span id="t-insertrow">Insert</span></button>
+        </div>
+        <div class="filter-bar" id="filter-bar" style="display:none">
+          <select class="filter-select" id="f-col"><option value="">Column</option></select>
+          <select class="filter-select" id="f-op"><option value="=">=</option><option value="!=">!=</option><option value=">">></option><option value="<"><</option><option value="ILIKE">contains</option></select>
+          <input class="filter-input" id="f-val" placeholder="Value...">
+          <button class="btn btn-primary" onclick="applyFilter()"><span class="ms">search</span>Filter</button>
+          <button class="btn btn-ghost" onclick="clearFilter()">Clear</button>
+        </div>
+        <div class="bulk-bar" id="bulk-bar">
+          <span style="font-size:12px;color:var(--accent)" id="bulk-count">0 selected</span>
+          <button class="btn btn-danger" onclick="bulkDelete()"><span class="ms">delete</span>Delete Selected</button>
+          <button class="btn btn-ghost" onclick="clearSelection()">Cancel</button>
+        </div>
+        <div class="tbl-wrap"><table class="dtable"><thead id="dtable-head"></thead><tbody id="dtable-body"></tbody></table></div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- CREATE TABLE MODAL -->
+<div class="modal-bg" id="modal-create">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">add_circle</span><span id="t-createtable">Create Table</span></div><button class="modal-close" onclick="closeModal('modal-create')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl" id="t-tablename">Table Name</label><input class="fi" id="ct-name" placeholder="e.g. users, products" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"></div>
+      <div class="mode-toggle"><button class="mode-btn active" id="mode-gui" onclick="setMode('gui')"><span class="ms">view_list</span>GUI</button><button class="mode-btn" id="mode-sql" onclick="setMode('sql')"><span class="ms">code</span>Raw SQL</button></div>
+      <div id="gui-mode">
+        <div class="col-row hdr"><span>Column</span><span>Type</span><span>Options</span><span></span></div>
+        <div id="cols-builder">
+          <div class="col-row"><input class="fi" value="id" readonly style="color:var(--muted);cursor:not-allowed;padding:6px 9px"><select class="fi" disabled style="padding:6px 9px"><option>SERIAL</option></select><div style="font-size:11px;color:var(--muted)">PK AUTO</div><div></div></div>
+        </div>
+        <button class="add-col-btn" onclick="addCol()"><span class="ms">add</span><span id="t-addcol">Add Column</span></button>
+      </div>
+      <div id="sql-mode" style="display:none">
+        <textarea class="sql-editor" id="ct-sql" placeholder="CREATE TABLE my_table (&#10;  id SERIAL PRIMARY KEY,&#10;  name TEXT NOT NULL,&#10;  email TEXT UNIQUE,&#10;  created_at TIMESTAMP DEFAULT NOW()&#10;)"></textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:5px"><span class="ms" style="font-size:13px">info</span> Table name prefixed automatically.</div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-create')" id="t-cancel">Cancel</button><button class="btn btn-primary" onclick="createTable()" id="btn-create"><span class="ms">check</span><span id="t-create">Create</span></button></div>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="modal-bg" id="modal-apikey">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">key</span>API Documentation</div><button class="modal-close" onclick="closeModal('modal-apikey')">✕</button></div>
+    <div class="modal-body">
+      <div class="api-panel">
+        <div class="api-panel-title"><span class="ms" style="font-size:14px">vpn_key</span>API Key</div>
+        <div class="api-key-box"><div class="api-key-val" id="api-key-display">—</div><button class="copy-btn" id="copy-key-btn" onclick="copyApiKey()"><span class="ms" style="font-size:13px">content_copy</span>Copy</button></div>
+        <div class="fg"><label class="fl">Base URL</label><div class="api-key-box"><div class="api-key-val" id="base-url-display" style="color:var(--accent)"></div><button class="copy-btn" onclick="copyText(document.getElementById('base-url-display').textContent)"><span class="ms" style="font-size:13px">content_copy</span></button></div></div>
+      </div>
+      <div class="fg"><label class="fl">Endpoints</label><div style="display:flex;flex-direction:column;gap:6px" id="endpoint-list"></div></div>
+      <div class="fg">
+        <label class="fl">Code Examples</label>
+        <div class="snippet-tabs"><button class="stab active" onclick="setSnippet('js')">JavaScript</button><button class="stab" onclick="setSnippet('python')">Python</button><button class="stab" onclick="setSnippet('curl')">cURL</button></div>
+        <div style="position:relative"><pre class="code-block" id="snippet-code"></pre><button class="copy-btn code-copy" onclick="copyText(document.getElementById('snippet-code').textContent)"><span class="ms" style="font-size:13px">content_copy</span></button></div>
+      </div>
+      <div class="api-panel" style="background:rgba(99,102,241,0.06);border-color:rgba(99,102,241,0.2)">
+        <div class="api-panel-title"><span class="ms" style="font-size:14px;color:var(--accent)">info</span>Instructions</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8;white-space:pre-line" id="api-instructions"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KEYS MANAGEMENT MODAL -->
+<div class="modal-bg" id="modal-keys">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">key</span>API Keys</div><button class="modal-close" onclick="closeModal('modal-keys')">✕</button></div>
+    <div class="modal-body">
+      <div id="keys-list"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">CREATE NEW KEY</div>
+        <div class="fg"><label class="fl">Key Name</label><input class="fi" id="new-key-name" placeholder="e.g. Production, Development"></div>
+        <div class="fg"><label class="fl">Permissions</label>
+          <select class="fi" id="new-key-perms">
+            <option value="read,write">Read + Write</option>
+            <option value="read">Read Only</option>
+            <option value="write">Write Only</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Expires (days, leave empty = never)</label><input class="fi" id="new-key-expires" type="number" placeholder="e.g. 30, 90, 365"></div>
+        <button class="btn btn-primary" onclick="createKey()" style="width:100%;justify-content:center"><span class="ms">add</span>Create Key</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP USERS MODAL -->
+<div class="modal-bg" id="modal-appusers">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">group</span>App Users</div><button class="modal-close" onclick="closeModal('modal-appusers')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--muted);background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:8px;padding:10px 12px;margin-bottom:14px">
+        <span class="ms" style="font-size:14px;color:var(--accent)">info</span>
+        These are users of your own app. They login via your API key using <code style="color:var(--accent2)">/api/auth/applogin</code>
+      </div>
+      <div id="appusers-list"><div style="text-align:center;color:var(--muted);padding:20px">Loading...</div></div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);font-family:var(--mono)">
+        Total: <span id="appusers-count">0</span> users
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEBHOOKS MODAL -->
+<div class="modal-bg" id="modal-webhooks">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">webhook</span>Webhooks</div><button class="modal-close" onclick="closeModal('modal-webhooks')">✕</button></div>
+    <div class="modal-body">
+      <div id="webhooks-list"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">ADD WEBHOOK</div>
+        <div class="fg"><label class="fl">Table</label>
+          <select class="fi" id="wh-table"><option value="">Select table...</option></select>
+        </div>
+        <div class="fg"><label class="fl">URL</label><input class="fi" id="wh-url" placeholder="https://your-site.com/webhook"></div>
+        <div class="fg"><label class="fl">Events</label>
+          <select class="fi" id="wh-events">
+            <option value="insert,update,delete">All events</option>
+            <option value="insert">Insert only</option>
+            <option value="update">Update only</option>
+            <option value="delete">Delete only</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="createWebhook()" style="width:100%;justify-content:center"><span class="ms">add</span>Add Webhook</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USAGE MODAL -->
+<div class="modal-bg" id="modal-usage">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">bar_chart</span>API Usage Stats</div><button class="modal-close" onclick="closeModal('modal-usage')">✕</button></div>
+    <div class="modal-body" id="usage-body"><div style="text-align:center;color:var(--muted);padding:20px">Loading...</div></div>
+  </div>
+</div>
+
+<!-- COLUMN MANAGEMENT MODAL -->
+<div class="modal-bg" id="modal-colmgmt">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">view_column</span>Manage Columns</div><button class="modal-close" onclick="closeModal('modal-colmgmt')">✕</button></div>
+    <div class="modal-body">
+      <div id="col-list-mgmt"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">ADD COLUMN</div>
+        <div style="display:grid;grid-template-columns:1fr 100px;gap:8px;margin-bottom:8px">
+          <input class="fi" id="new-col-name" placeholder="column_name" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+          <select class="fi" id="new-col-type"><option>TEXT</option><option>INTEGER</option><option>REAL</option><option>BOOLEAN</option><option>DATE</option><option>TIMESTAMP</option></select>
+        </div>
+        <button class="btn btn-success" onclick="addColumn()" style="width:100%;justify-content:center"><span class="ms">add</span>Add Column</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT CSV MODAL -->
+<div class="modal-bg" id="modal-import">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">upload</span>Import CSV</div><button class="modal-close" onclick="closeModal('modal-import')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">First row must be column headers. <code style="color:var(--accent2)">id</code> column will be skipped.</div>
+      <div class="fg"><label class="fl">CSV File</label><input type="file" accept=".csv" id="csv-file" class="fi" style="padding:7px"></div>
+      <div id="csv-preview" style="margin-bottom:12px"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-import')">Cancel</button><button class="btn btn-primary" onclick="importCSV()" id="btn-import"><span class="ms">upload</span>Import</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- INSERT ROW MODAL -->
+<div class="modal-bg" id="modal-insert">
+  <div class="modal"><div class="modal-hdr"><div class="modal-title"><span class="ms">add_row</span><span id="t-insertrow2">Insert Row</span></div><button class="modal-close" onclick="closeModal('modal-insert')">✕</button></div><div class="modal-body" id="insert-body"></div></div>
+</div>
+
+<!-- EDIT ROW MODAL -->
+<div class="modal-bg" id="modal-edit">
+  <div class="modal"><div class="modal-hdr"><div class="modal-title"><span class="ms">edit</span><span id="t-editrow">Edit Row</span></div><button class="modal-close" onclick="closeModal('modal-edit')">✕</button></div><div class="modal-body" id="edit-body"></div></div>
+</div>
+
+<!-- RENAME TABLE MODAL -->
+<div class="modal-bg" id="modal-rename">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">edit</span>Rename Table</div><button class="modal-close" onclick="closeModal('modal-rename')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">New Name</label><input class="fi" id="rename-val" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"></div>
+      <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-rename')">Cancel</button><button class="btn btn-primary" onclick="doRename()"><span class="ms">check</span>Rename</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANS MODAL -->
+<div class="modal-bg" id="modal-plans">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">star</span>Upgrade Plan</div><button class="modal-close" onclick="closeModal('modal-plans')">✕</button></div>
+    <div class="modal-body" id="plans-body"></div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-bg" id="modal-profile">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hdr"><div class="modal-title"><span class="ms">person</span>Profile</div><button class="modal-close" onclick="closeModal('modal-profile')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Name</label><input class="fi" id="profile-name"></div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" id="profile-email" readonly style="color:var(--muted)"></div>
+      <div class="fg"><label class="fl">Plan</label><input class="fi" id="profile-plan" readonly style="color:var(--muted)"></div>
+      <button class="btn btn-primary" onclick="saveProfile()" style="width:100%;justify-content:center"><span class="ms">save</span>Save</button>
+      <button class="btn btn-danger" onclick="logout()" style="width:100%;justify-content:center;margin-top:8px"><span class="ms">logout</span>Logout</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TEMPLATES MODAL -->
+<div class="modal-bg" id="modal-templates">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-hdr">
+      <div class="modal-title"><span class="ms">auto_awesome</span> Template Marketplace</div>
+      <button class="modal-close" onclick="closeModal('modal-templates')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:12.5px;color:var(--muted);flex:1">One-click setup for common app types.</div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="tpl-sample" checked style="accent-color:var(--accent)"> Sample data</label>
+      </div>
+      <div id="templates-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="color:var(--muted);font-size:12.5px;grid-column:1/-1;text-align:center;padding:20px">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTION INSERT MODAL -->
+<div class="modal-bg" id="modal-col-insert">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title"><span class="ms">data_object</span> Insert Document</div>
+      <button class="modal-close" onclick="closeModal('modal-col-insert')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Enter JSON (MongoDB-style):</div>
+      <textarea id="col-insert-data" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:12px;color:#a5f3fc;font-size:12px;font-family:var(--mono);outline:none;resize:vertical;min-height:130px;line-height:1.6" placeholder='{"name": "John", "age": 25, "tags": ["a", "b"]}'></textarea>
+      <div id="json-err" style="font-size:11px;color:var(--danger);margin-top:5px;display:none"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-col-insert')">Cancel</button>
+        <button class="btn btn-success" onclick="insertCollection()"><span class="ms">add</span>Insert</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTION EDIT MODAL -->
+<div class="modal-bg" id="modal-col-edit">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title"><span class="ms">edit</span> Edit Document</div>
+      <button class="modal-close" onclick="closeModal('modal-col-edit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="col-edit-data" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:12px;color:#a5f3fc;font-size:12px;font-family:var(--mono);outline:none;resize:vertical;min-height:150px;line-height:1.6"></textarea>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--muted);cursor:pointer">
+        <input type="checkbox" id="col-replace-mode" style="accent-color:var(--accent)"> Replace mode (overwrite entire document)
+      </label>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-col-edit')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCollection()"><span class="ms">save</span>Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const API = '';
+const token = localStorage.getItem('tb_token');
+const user = JSON.parse(localStorage.getItem('tb_user') || 'null');
+if (!token || !user) window.location.href = '/';
+
+let tables = [], activeTbl = null, rows = [], cols = [], filteredRows = [], currentPage = 1, colCount = 0, createMode = 'gui';
+let selectedRows = new Set();
+let currentApiKey = '', currentSnippetLang = 'js', keyModalTable = '';
+let sortCol = 'id', sortDir = 'DESC';
+let filterActive = false, filterCol = '', filterOp = '=', filterVal = '';
+let searchQuery = '';
+const PAGE = 20;
+
+// INIT UI
+document.getElementById('sb-name').textContent = user?.name || 'User';
+document.getElementById('sb-avatar').textContent = (user?.name||'U')[0].toUpperCase();
+document.getElementById('sb-plan').textContent = user?.plan || 'Free';
+document.getElementById('st-plan').textContent = (user?.plan || 'free').charAt(0).toUpperCase() + (user?.plan||'free').slice(1);
+
+function H() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }; }
+function logout() { localStorage.clear(); window.location.href = '/'; }
+
+// THEME
+let isDark = localStorage.getItem('theme') !== 'light';
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isDark ? 'dark_mode' : 'light_mode';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+if (!isDark) { document.body.setAttribute('data-theme','light'); document.getElementById('theme-icon').textContent = 'light_mode'; }
+
+// TRANSLATIONS
+const T = {
+  en:{ workspace:'Workspace',overview:'Overview',tables:'Tables',apikeys:'API Keys',appusers:'App Users',webhooks:'Webhooks',usage:'API Usage',mytables:'My Tables',freeplan:'Free Plan',newtable:'New Table',totaltables:'Total Tables',yourdbs:'Your databases',totalrows:'Total Rows',allrows:'Across all tables',plan:'Plan',manage:'Manage keys',yourtables:'Your Tables',insertrow:'Insert',createtable:'Create Table',tablename:'Table Name',colname:'Column',type:'Type',addcol:'Add Column',cancel:'Cancel',create:'Create',bctables:'Tables',search:'Search...',howto:'1. Get your API Key from the keys panel\n2. Use ?key=YOUR_KEY in all requests\n3. Choose your table name\n4. GET=read, POST=insert, PUT=update, DELETE=remove' },
+  bn:{ workspace:'ওয়ার্কস্পেস',overview:'ওভারভিউ',tables:'টেবিল',apikeys:'API কি',appusers:'অ্যাপ ইউজার',webhooks:'ওয়েবহুক',usage:'API ব্যবহার',mytables:'আমার টেবিল',freeplan:'ফ্রি প্ল্যান',newtable:'নতুন টেবিল',totaltables:'মোট টেবিল',yourdbs:'আপনার ডেটাবেস',totalrows:'মোট রো',allrows:'সব টেবিল মিলিয়ে',plan:'প্ল্যান',manage:'কি ম্যানেজ করুন',yourtables:'আপনার টেবিল',insertrow:'যোগ করুন',createtable:'টেবিল তৈরি করুন',tablename:'টেবিলের নাম',colname:'কলাম',type:'ধরন',addcol:'কলাম যোগ',cancel:'বাতিল',create:'তৈরি করুন',bctables:'টেবিল',search:'খুঁজুন...',howto:'১. API Key নিন\n২. সব request-এ ?key=YOUR_KEY যোগ করুন\n৩. টেবিলের নাম দিন\n৪. GET=পড়া, POST=যোগ, PUT=আপডেট, DELETE=মোছা' },
+  hi:{ workspace:'वर्कस्पेस',overview:'अवलोकन',tables:'टेबल',apikeys:'API कुंजी',appusers:'ऐप उपयोगकर्ता',webhooks:'वेबहुक',usage:'API उपयोग',mytables:'मेरी टेबल',freeplan:'मुफ्त प्लान',newtable:'नई टेबल',totaltables:'कुल टेबल',yourdbs:'आपके डेटाबेस',totalrows:'कुल पंक्तियां',allrows:'सभी टेबल में',plan:'प्लान',manage:'कुंजी प्रबंधन',yourtables:'आपकी टेबल',insertrow:'जोड़ें',createtable:'टेबल बनाएं',tablename:'टेबल नाम',colname:'कॉलम',type:'प्रकार',addcol:'कॉलम जोड़ें',cancel:'रद्द करें',create:'बनाएं',bctables:'टेबल',search:'खोजें...',howto:'1. API Key लें\n2. सभी request में ?key=YOUR_KEY जोड़ें\n3. टेबल का नाम दें\n4. GET=पढ़ें, POST=जोड़ें, PUT=अपडेट, DELETE=हटाएं' }
+};
+let lang = localStorage.getItem('datarix_lang') || 'en';
+function setLang(l) {
+  lang = l; localStorage.setItem('datarix_lang', l);
+  document.querySelectorAll('.lb').forEach((b,i) => b.className='lb'+(['en','bn','hi'][i]===l?' active':''));
+  const t = T[l];
+  const map = {'n-workspace':'workspace','n-overview':'overview','n-tables':'tables','n-apikeys':'apikeys','n-appusers':'appusers','n-webhooks':'webhooks','n-usage':'usage','n-mytables':'mytables','t-newtable':'newtable','t-totaltables':'totaltables','t-yourdbs':'yourdbs','t-totalrows':'totalrows','t-allrows':'allrows','t-plan':'plan','t-manage':'manage','t-yourtables':'yourtables','t-insertrow':'insertrow','t-insertrow2':'insertrow','t-createtable':'createtable','t-tablename':'tablename','t-addcol':'addcol','t-cancel':'cancel','t-create':'create','t-bc-tables':'bctables'};
+  for(const [id,key] of Object.entries(map)){const el=document.getElementById(id);if(el&&t[key])el.textContent=t[key];}
+  const si=document.getElementById('search-inp');if(si)si.placeholder=t.search;
+  const ai=document.getElementById('api-instructions');if(ai)ai.textContent=t.howto;
+}
+setLang(lang);
+
+// SETTINGS
+async function loadSettings() {
+  try {
+    const r = await fetch(`${API}/api/admin/settings`);
+    const s = await r.ok ? r.json() : {};
+    if(s.support_link) document.getElementById('support-fab').href=s.support_link;
+    if(s.announcement){document.getElementById('ann-text').textContent=s.announcement;document.getElementById('ann').style.display='flex';}
+    if(s.maintenance_mode==='true'){showToast('Site is in maintenance mode','info');}
+  } catch(e){}
+}
+
+// TABLES
+async function loadTables() {
+  try {
+    const r = await fetch(`${API}/api/tables/list`,{headers:H()});
+    if(r.status===401){logout();return;}
+    const d = await r.json();
+    tables = d.tables||[];
+    renderGrid(); renderSbTables();
+    document.getElementById('st-tables').textContent = tables.length;
+    document.getElementById('st-rows').textContent = tables.reduce((s,t)=>s+(t.row_count||0),0);
+  } catch(e){showToast('Failed to load tables','error');}
+}
+
+function renderGrid(){
+  const g = document.getElementById('tbl-grid');
+  if(!tables.length){g.innerHTML=`<div class="add-tcard" onclick="openCreateModal()"><span class="ms" style="font-size:24px;color:var(--accent)">add_circle</span><div style="font-weight:600">Create first table</div></div>`;return;}
+  g.innerHTML = tables.map(t=>`
+    <div class="tcard ${activeTbl===t.table_name?'sel':''}" onclick="openTable('${t.table_name}')">
+      <div class="tcard-acts">
+        <div class="icon-btn dup" onclick="event.stopPropagation();duplicateTbl('${t.table_name}')" title="Duplicate"><span class="ms" style="font-size:11px">content_copy</span></div>
+        <div class="icon-btn edit" onclick="event.stopPropagation();openRenameModal('${t.table_name}')" title="Rename"><span class="ms" style="font-size:11px">edit</span></div>
+        <div class="icon-btn" onclick="event.stopPropagation();openApiKeyModal('${t.table_name}')" title="API"><span class="ms" style="font-size:11px">key</span></div>
+        <div class="icon-btn" onclick="event.stopPropagation();deleteTbl('${t.table_name}')" title="Delete"><span class="ms" style="font-size:11px">delete</span></div>
+      </div>
+      <div class="tcard-name"><span class="ms" style="font-size:14px;color:var(--accent)">table_chart</span>${t.table_name}<span class="badge ${t.table_type==='collection'?'badge-col':''}">${t.table_type==='collection'?'COL':'SQL'}</span></div>
+      <div class="tcard-meta">${t.row_count||0} rows</div>
+      <div class="tcard-cols">${(t.schema?.columns||[]).map(c=>c.name+':'+c.type).join(' · ')||'Custom SQL'}</div>
+    </div>`).join('')+`<div class="add-tcard" onclick="openCreateModal()"><span class="ms" style="font-size:18px">add</span>${T[lang].newtable}</div>`;
+}
+
+function renderSbTables(){
+  document.getElementById('sb-tables').innerHTML=tables.map(t=>`<div class="tbl-nav ${activeTbl===t.table_name?'active':''}" onclick="openTable('${t.table_name}')"><div class="tbl-dot"></div>${t.table_name}</div>`).join('');
+}
+
+async function openTable(name){
+  activeTbl=name;currentPage=1;selectedRows.clear();closeSb();
+  document.getElementById('topbar-title').innerHTML=`Tables › <strong>${name}</strong>`;
+  document.getElementById('dv-name').textContent=name;
+  document.getElementById('dp-title').innerHTML=`<span class="ms" style="color:var(--accent);font-size:14px">table_chart</span> ${name}`;
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('data-view').style.display='block';
+  document.getElementById('search-inp').value='';
+  document.getElementById('filter-bar').style.display='none';
+  filterActive=false;searchQuery='';
+  renderGrid();renderSbTables();
+  await loadRows();
+  populateFilterCols();
+}
+
+function showHome(){
+  activeTbl=null;
+  document.getElementById('data-view').style.display='none';
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('topbar-title').innerHTML='<strong>'+T[lang].overview+'</strong>';
+  renderGrid();renderSbTables();closeSb();
+}
+
+async function loadRows(){
+  try{
+    let url=`${API}/api/rows/list?table=${activeTbl}&page=${currentPage}&limit=${PAGE}&sort=${sortCol}&dir=${sortDir}`;
+    if(searchQuery) url+=`&search=${encodeURIComponent(searchQuery)}`;
+    if(filterActive&&filterCol) url+=`&filter_col=${filterCol}&filter_op=${encodeURIComponent(filterOp)}&filter_val=${encodeURIComponent(filterVal)}`;
+    const r=await fetch(url,{headers:H()});
+    const d=await r.json();
+    rows=d.rows||[];cols=d.cols||[];
+    renderDataTable(d.total||0);
+  }catch(e){showToast('Failed to load rows','error');}
+}
+
+function renderDataTable(total){
+  const thead=document.getElementById('dtable-head');
+  const tbody=document.getElementById('dtable-body');
+  thead.innerHTML=`<tr><th><input type="checkbox" class="row-check" onchange="toggleAllRows(this.checked)"></th>${cols.map(c=>`<th onclick="sortBy('${c.column_name}')" title="Sort">${c.column_name}<span class="ct">${c.data_type}</span>${sortCol===c.column_name?'<span style="color:var(--accent)">'+(sortDir==='ASC'?'↑':'↓')+'</span>':''}</th>`).join('')}<th style="width:80px">Actions</th></tr>`;
+  if(!rows.length){tbody.innerHTML=`<tr><td colspan="${cols.length+2}"><div class="empty-state"><span class="ms" style="font-size:36px;opacity:0.3">table_rows</span><div style="margin-top:8px;font-size:12.5px">No rows. Click Insert to add data.</div></div></td></tr>`;document.getElementById('pagination').innerHTML='';return;}
+  tbody.innerHTML=rows.map(row=>`<tr><td><input type="checkbox" class="row-check" ${selectedRows.has(row.id)?'checked':''} onchange="toggleRow(${row.id},this.checked)"></td>${cols.map(c=>{const v=row[c.column_name];if(v===null||v===undefined)return`<td class="null-v">NULL</td>`;if(c.column_name==='id')return`<td class="id-col">${v}</td>`;const s=String(v);return`<td title="${s}">${s.length>35?s.slice(0,35)+'…':s}</td>`}).join('')}<td><div class="row-acts"><div class="icon-btn edit" onclick="openEditModal(${JSON.stringify(row).replace(/"/g,'&quot;')})"><span class="ms" style="font-size:11px">edit</span></div><div class="icon-btn" onclick="deleteRow(${row.id})"><span class="ms" style="font-size:11px">delete</span></div></div></td></tr>`).join('');
+  const pages=Math.ceil(total/PAGE);const pag=document.getElementById('pagination');
+  if(pages<=1){pag.innerHTML=`<div class="pg-info">Total: ${total}</div>`;return;}
+  let btns='';
+  if(currentPage>1)btns+=`<button class="pg-btn" onclick="goPage(${currentPage-1})"><span class="ms" style="font-size:12px">chevron_left</span></button>`;
+  for(let i=Math.max(1,currentPage-2);i<=Math.min(pages,currentPage+2);i++)btns+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  if(currentPage<pages)btns+=`<button class="pg-btn" onclick="goPage(${currentPage+1})"><span class="ms" style="font-size:12px">chevron_right</span></button>`;
+  pag.innerHTML=btns+`<div class="pg-info">${(currentPage-1)*PAGE+1}–${Math.min(currentPage*PAGE,total)} / ${total}</div>`;
+}
+
+async function goPage(p){currentPage=p;await loadRows();}
+function sortBy(col){if(sortCol===col)sortDir=sortDir==='ASC'?'DESC':'ASC';else{sortCol=col;sortDir='ASC';}currentPage=1;loadRows();}
+
+// SEARCH & FILTER
+let searchTimer;
+function doSearch(){
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{searchQuery=document.getElementById('search-inp').value;currentPage=1;loadRows();},400);
+}
+function showFilterBar(){document.getElementById('filter-bar').style.display=document.getElementById('filter-bar').style.display==='none'?'flex':'none';}
+function populateFilterCols(){const sel=document.getElementById('f-col');sel.innerHTML='<option value="">Column</option>'+cols.map(c=>`<option value="${c.column_name}">${c.column_name}</option>`).join('');}
+async function applyFilter(){filterCol=document.getElementById('f-col').value;filterOp=document.getElementById('f-op').value;filterVal=document.getElementById('f-val').value;filterActive=!!(filterCol&&filterVal);currentPage=1;await loadRows();}
+function clearFilter(){filterActive=false;filterCol='';filterOp='=';filterVal='';document.getElementById('f-col').value='';document.getElementById('f-val').value='';currentPage=1;loadRows();}
+
+// BULK SELECT
+function toggleRow(id,checked){if(checked)selectedRows.add(id);else selectedRows.delete(id);updateBulkBar();}
+function toggleAllRows(checked){rows.forEach(r=>{if(checked)selectedRows.add(r.id);else selectedRows.delete(r.id);});updateBulkBar();document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checked);}
+function updateBulkBar(){const n=selectedRows.size;const bar=document.getElementById('bulk-bar');bar.className='bulk-bar'+(n>0?' show':'');document.getElementById('bulk-count').textContent=`${n} selected`;}
+function clearSelection(){selectedRows.clear();updateBulkBar();document.querySelectorAll('.row-check').forEach(cb=>cb.checked=false);}
+async function bulkDelete(){if(!confirm(`Delete ${selectedRows.size} rows?`))return;try{const r=await fetch(`${API}/api/rows/delete?table=${activeTbl}`,{method:'DELETE',headers:H(),body:JSON.stringify({table:activeTbl,ids:[...selectedRows]})});if(!r.ok){showToast('Failed','error');return;}selectedRows.clear();updateBulkBar();await loadRows();loadTables();showToast('Rows deleted','error');}catch(e){showToast('Error','error');}}
+
+// CREATE TABLE
+function setMode(m){createMode=m;document.getElementById('gui-mode').style.display=m==='gui'?'block':'none';document.getElementById('sql-mode').style.display=m==='sql'?'block':'none';const cm=document.getElementById('col-mode');if(cm)cm.style.display=m==='col'?'block':'none';document.getElementById('mode-gui').className='mode-btn'+(m==='gui'?' active':'');document.getElementById('mode-sql').className='mode-btn'+(m==='sql'?' active':'');const cb=document.getElementById('mode-col');if(cb)cb.className='mode-btn'+(m==='col'?' active':'');}
+function openCreateModal(){document.getElementById('ct-name').value='';document.getElementById('ct-sql').value='';document.getElementById('cols-builder').innerHTML=`<div class="col-row"><input class="fi" value="id" readonly style="color:var(--muted);cursor:not-allowed;padding:6px 9px"><select class="fi" disabled style="padding:6px 9px"><option>SERIAL</option></select><div style="font-size:11px;color:var(--muted)">PK AUTO</div><div></div></div>`;colCount=0;setMode('gui');openModal('modal-create');}
+function addCol(){
+  colCount++;const id='cr-'+colCount;const div=document.createElement('div');div.className='col-row';div.id=id;
+  div.innerHTML=`<input class="fi" placeholder="col_name" style="padding:6px 9px" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"><select class="fi" style="padding:6px 9px"><option>TEXT</option><option>INTEGER</option><option>REAL</option><option>BOOLEAN</option><option>DATE</option><option>TIMESTAMP</option><option>BIGINT</option><option>NUMERIC</option></select><select class="fi" style="padding:6px 9px;font-size:11px"><option value="">optional</option><option value="not_null">NOT NULL</option><option value="unique">UNIQUE</option><option value="not_null_unique">NOT NULL+UNIQUE</option></select><button class="remove-col" onclick="document.getElementById('${id}').remove()"><span class="ms" style="font-size:12px">close</span></button>`;
+  document.getElementById('cols-builder').appendChild(div);
+}
+async function createTable(){
+  const name=document.getElementById('ct-name').value.trim();if(!name){showToast('Table name required','error');return;}
+  let body={table_name:name,table_type:createMode==='col'?'collection':'sql'};
+  if(createMode==='col'){/* collection - no columns needed */}
+  else if(createMode==='sql'){const raw=document.getElementById('ct-sql').value.trim();if(!raw){showToast('SQL required','error');return;}body.raw_sql=raw;}
+  else{const colRows=document.querySelectorAll('#cols-builder .col-row');const columns=[];let valid=true;colRows.forEach((r,i)=>{if(i===0)return;const inp=r.querySelector('input');const sels=r.querySelectorAll('select');if(inp&&sels[0]){if(!inp.value.trim()){valid=false;return;}const opts=sels[1]?.value||'';columns.push({name:inp.value.trim(),type:sels[0].value,not_null:opts.includes('not_null'),unique:opts.includes('unique')});}});if(!valid){showToast('All columns need names','error');return;}body.columns=columns;}
+  const btn=document.getElementById('btn-create');btn.disabled=true;btn.innerHTML='<div class="spin"></div>';
+  try{const r=await fetch(`${API}/api/tables/create`,{method:'POST',headers:H(),body:JSON.stringify(body)});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');}else{closeModal('modal-create');await loadTables();showToast(`"${name}" created!`,'success');openTable(name);setTimeout(()=>openApiKeyModal(name),700);}}catch(e){showToast('Network error','error');}
+  btn.disabled=false;btn.innerHTML=`<span class="ms">check</span>${T[lang].create}`;
+}
+
+// TABLE ACTIONS
+async function deleteTbl(name){if(!confirm(`Delete "${name}" and all its data?`))return;try{const r=await fetch(`${API}/api/tables/delete`,{method:'DELETE',headers:H(),body:JSON.stringify({table_name:name})});if(!r.ok){showToast('Failed','error');return;}if(activeTbl===name)showHome();await loadTables();showToast(`"${name}" deleted`,'error');}catch(e){showToast('Error','error');}}
+async function duplicateTbl(name){try{const r=await fetch(`${API}/api/tables/duplicate`,{method:'POST',headers:H(),body:JSON.stringify({table_name:name})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');return;}await loadTables();showToast(`"${name}" duplicated!`,'success');}catch(e){showToast('Error','error');}}
+
+let renameTarget='';
+function openRenameModal(name){renameTarget=name;document.getElementById('rename-val').value=name;openModal('modal-rename');}
+async function doRename(){const newName=document.getElementById('rename-val').value.trim();if(!newName){showToast('Name required','error');return;}try{const r=await fetch(`${API}/api/tables/rename`,{method:'POST',headers:H(),body:JSON.stringify({table_name:renameTarget,new_name:newName})});if(!r.ok){showToast('Failed','error');return;}closeModal('modal-rename');if(activeTbl===renameTarget)activeTbl=newName;await loadTables();showToast('Renamed!','success');}catch(e){showToast('Error','error');}}
+
+// COLUMN MANAGEMENT
+async function openColMgmtModal(){
+  try{const r=await fetch(`${API}/api/tables/columns?table=${activeTbl}`,{headers:H()});const d=await r.json();const list=document.getElementById('col-list-mgmt');list.innerHTML=(d.columns||[]).map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border-radius:7px;margin-bottom:5px"><span style="flex:1;font-family:var(--mono);font-size:12px">${c.column_name}</span><span style="font-size:11px;color:var(--accent)">${c.data_type}</span><span style="font-size:11px;color:var(--muted)">${c.is_nullable==='YES'?'nullable':'not null'}</span>${c.column_name!=='id'?`<div class="icon-btn" onclick="dropColumn('${c.column_name}')"><span class="ms" style="font-size:11px">delete</span></div>`:''}</div>`).join('');}catch(e){}
+  document.getElementById('new-col-name').value='';openModal('modal-colmgmt');
+}
+async function addColumn(){const name=document.getElementById('new-col-name').value.trim();const type=document.getElementById('new-col-type').value;if(!name){showToast('Column name required','error');return;}try{const r=await fetch(`${API}/api/tables/addcol`,{method:'POST',headers:H(),body:JSON.stringify({table_name:activeTbl,column_name:name,column_type:type})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');return;}showToast(`Column "${name}" added!`,'success');closeModal('modal-colmgmt');await loadRows();}catch(e){showToast('Error','error');}}
+async function dropColumn(col){if(!confirm(`Drop column "${col}"? All data in this column will be lost.`))return;try{const r=await fetch(`${API}/api/tables/dropcol`,{method:'POST',headers:H(),body:JSON.stringify({table_name:activeTbl,column_name:col})});if(!r.ok){showToast('Failed','error');return;}showToast(`Column "${col}" dropped`,'error');closeModal('modal-colmgmt');await loadRows();}catch(e){showToast('Error','error');}}
+
+// INSERT / EDIT
+function openInsertModal(){
+  const tI=tables.find(t=>t.table_name===activeTbl);
+  if(tI&&tI.table_type==='collection'){openColInsertModal();return;}
+  const ec=cols.filter(c=>c.column_name!=='id');document.getElementById('insert-body').innerHTML=ec.map(c=>`<div class="fg"><label class="fl">${c.column_name} <span style="color:var(--accent)">${c.data_type}</span></label><input class="fi" id="ins-${c.column_name}" placeholder="${c.data_type.includes('int')?'0':'value...'}"></div>`).join('')+`<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-insert')">${T[lang].cancel}</button><button class="btn btn-success" onclick="insertRow()"><span class="ms">add_row</span>Insert</button></div>`;openModal('modal-insert');}
+async function insertRow(){const data={};cols.filter(c=>c.column_name!=='id').forEach(c=>{data[c.column_name]=document.getElementById('ins-'+c.column_name).value||null;});try{const r=await fetch(`${API}/api/rows/insert`,{method:'POST',headers:H(),body:JSON.stringify({table:activeTbl,data})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');return;}closeModal('modal-insert');await loadRows();loadTables();showToast('Row inserted!','success');}catch(e){showToast('Error','error');}}
+function openEditModal(row){if(typeof row==='string')row=JSON.parse(row.replace(/&quot;/g,'"'));
+  const tI=tables.find(t=>t.table_name===activeTbl);
+  if(tI&&tI.table_type==='collection'){openColEditModal(row.id,typeof row.data==='object'?row.data:(row.data?JSON.parse(row.data):row));return;}document.getElementById('edit-body').innerHTML=cols.map(c=>`<div class="fg"><label class="fl">${c.column_name} <span style="color:var(--accent)">${c.data_type}</span></label><input class="fi" id="edit-${c.column_name}" value="${row[c.column_name]??''}" ${c.column_name==='id'?'readonly style="color:var(--muted);cursor:not-allowed"':''}></div>`).join('')+`<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-edit')">${T[lang].cancel}</button><button class="btn btn-primary" onclick="saveEdit(${row.id})"><span class="ms">save</span>Save</button></div>`;openModal('modal-edit');}
+async function saveEdit(id){const data={};cols.filter(c=>c.column_name!=='id').forEach(c=>{data[c.column_name]=document.getElementById('edit-'+c.column_name).value||null;});try{const r=await fetch(`${API}/api/rows/update`,{method:'PUT',headers:H(),body:JSON.stringify({table:activeTbl,id,data})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');return;}closeModal('modal-edit');await loadRows();showToast('Updated!','success');}catch(e){showToast('Error','error');}}
+async function deleteRow(id){if(!confirm('Delete this row?'))return;try{await fetch(`${API}/api/rows/delete?table=${activeTbl}`,{method:'DELETE',headers:H(),body:JSON.stringify({table:activeTbl,id})});await loadRows();loadTables();showToast('Deleted','error');}catch(e){showToast('Error','error');}}
+
+// CSV EXPORT
+async function exportCSV(){try{const r=await fetch(`${API}/api/tables/export?table=${activeTbl}`,{headers:H()});const d=await r.json();if(!d.csv){showToast('No data to export','info');return;}const blob=new Blob([d.csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=d.filename||`${activeTbl}.csv`;a.click();showToast('CSV downloaded!','success');}catch(e){showToast('Export failed','error');}}
+
+// CSV IMPORT
+function openImportModal(){document.getElementById('csv-preview').innerHTML='';document.getElementById('csv-file').value='';openModal('modal-import');}
+document.addEventListener('DOMContentLoaded',()=>{const cf=document.getElementById('csv-file');if(cf)cf.addEventListener('change',function(){const f=this.files[0];if(!f)return;const reader=new FileReader();reader.onload=e=>{const lines=e.target.result.split('\n').slice(0,4);document.getElementById('csv-preview').innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Preview (first 3 rows):</div><pre style="font-size:10.5px;color:var(--accent2);background:var(--bg);padding:8px;border-radius:6px;overflow-x:auto">${lines.join('\n')}</pre>`;};reader.readAsText(f);});});
+async function importCSV(){const f=document.getElementById('csv-file').files[0];if(!f){showToast('Select a CSV file','error');return;}const btn=document.getElementById('btn-import');btn.disabled=true;btn.innerHTML='<div class="spin"></div>';try{const text=await f.text();const r=await fetch(`${API}/api/tables/import`,{method:'POST',headers:H(),body:JSON.stringify({table_name:activeTbl,csv_data:text})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');}else{closeModal('modal-import');await loadRows();loadTables();showToast(`${d.imported} rows imported!`,'success');}}catch(e){showToast('Error','error');}btn.disabled=false;btn.innerHTML='<span class="ms">upload</span>Import';}
+
+// API KEY MODAL
+async function openApiKeyModal(tbl){
+  keyModalTable=tbl||activeTbl||(tables[0]?.table_name||'your_table');
+  document.getElementById('base-url-display').textContent=window.location.origin+'/api/data';
+  document.getElementById('api-instructions').textContent=T[lang].howto;
+  renderEndpoints();renderSnippet();openModal('modal-apikey');
+  try{const r=await fetch(`${API}/api/keys/list`,{headers:H()});const d=await r.json();if(d.keys?.length){currentApiKey=d.keys[0].api_key;document.getElementById('api-key-display').textContent=currentApiKey;renderSnippet();}else{document.getElementById('api-key-display').textContent='No key yet — go to API Keys';}}catch(e){}
+}
+function copyApiKey(){copyText(currentApiKey);const btn=document.getElementById('copy-key-btn');btn.className='copy-btn copied';btn.innerHTML='<span class="ms" style="font-size:12px">check</span>Copied!';setTimeout(()=>{btn.className='copy-btn';btn.innerHTML='<span class="ms" style="font-size:12px">content_copy</span>Copy';},2000);}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showToast('Copied!','success')).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied!','success');});}
+function renderEndpoints(){const base=window.location.origin+'/api/data';const tbl=keyModalTable||'your_table';const eps=[{method:'GET',color:'#3ecf8e',url:`${base}?table=${tbl}&key=YOUR_KEY`},{method:'POST',color:'#6366f1',url:`${base}?table=${tbl}&key=YOUR_KEY`},{method:'PUT',color:'#f4a261',url:`${base}?table=${tbl}&key=YOUR_KEY`},{method:'DELETE',color:'#f25f5c',url:`${base}?table=${tbl}&id=1&key=YOUR_KEY`}];document.getElementById('endpoint-list').innerHTML=eps.map(e=>`<div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px"><span style="font-size:10px;font-weight:700;color:${e.color};font-family:var(--mono);width:48px">${e.method}</span><span style="font-size:10.5px;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono)">${e.url}</span><button class="copy-btn" onclick="copyText('${e.url}')"><span class="ms" style="font-size:12px">content_copy</span></button></div>`).join('');}
+function setSnippet(l){currentSnippetLang=l;document.querySelectorAll('.stab').forEach((b,i)=>b.className='stab'+(['js','python','curl'][i]===l?' active':''));renderSnippet();}
+function renderSnippet(){const k=currentApiKey||'dk_your_api_key';const base=window.location.origin;const tbl=keyModalTable||'your_table';const s={js:`const API='${base}';const KEY='${k}';const TABLE='${tbl}';\n\n// Read\nconst res=await fetch(\`\${API}/api/data?table=\${TABLE}&key=\${KEY}\`);\nconst {rows}=await res.json();\n\n// Insert\nawait fetch(\`\${API}/api/data?table=\${TABLE}&key=\${KEY}\`,{\n  method:'POST',headers:{'Content-Type':'application/json'},\n  body:JSON.stringify({name:'John',email:'john@mail.com'})\n});\n\n// Update\nawait fetch(\`\${API}/api/data?table=\${TABLE}&key=\${KEY}\`,{\n  method:'PUT',headers:{'Content-Type':'application/json'},\n  body:JSON.stringify({id:1,name:'Updated'})\n});\n\n// Delete\nawait fetch(\`\${API}/api/data?table=\${TABLE}&id=1&key=\${KEY}\`,{method:'DELETE'});`,python:`import requests\nAPI='${base}'\nKEY='${k}'\nTABLE='${tbl}'\n\n# Read\nrows=requests.get(f'{API}/api/data',params={'table':TABLE,'key':KEY}).json()['rows']\n\n# Insert\nrequests.post(f'{API}/api/data',params={'table':TABLE,'key':KEY},json={'name':'John','email':'john@mail.com'})\n\n# App User Register\nrequests.post(f'{API}/api/auth/appregister',headers={'X-Api-Key':KEY},json={'name':'User','email':'u@mail.com','password':'pass123'})`,curl:`# Read\ncurl "${base}/api/data?table=${tbl}&key=${k}"\n\n# Insert\ncurl -X POST "${base}/api/data?table=${tbl}&key=${k}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"name":"John","email":"john@mail.com"}'\n\n# App User Register\ncurl -X POST "${base}/api/auth/appregister?key=${k}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"name":"User","email":"u@mail.com","password":"pass123"}'\n\n# App User Login\ncurl -X POST "${base}/api/auth/applogin?key=${k}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"email":"u@mail.com","password":"pass123"}'`};const el=document.getElementById('snippet-code');if(el)el.textContent=s[currentSnippetLang]||s.js;}
+
+// KEYS MODAL
+async function openKeysModal(){
+  openModal('modal-keys');
+  try{const r=await fetch(`${API}/api/keys/list`,{headers:H()});const d=await r.json();const list=document.getElementById('keys-list');if(!d.keys?.length){list.innerHTML='<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:14px">No API keys yet</div>';return;}list.innerHTML=d.keys.map(k=>`<div class="key-item"><div style="flex:1;overflow:hidden"><div class="key-val">${k.api_key}</div><div class="key-meta">${k.name} · <span class="perm-badge perm-read">read</span>${k.permissions?.includes('write')?'<span class="perm-badge perm-write">write</span>':''} · Used ${k.use_count||0}x${k.expires_at?` · Expires ${new Date(k.expires_at).toLocaleDateString()}`:' · No expiry'}</div></div><button class="copy-btn" onclick="copyText('${k.api_key}')"><span class="ms" style="font-size:12px">content_copy</span></button><div class="icon-btn" onclick="rotateKey(${k.id})" title="Rotate"><span class="ms" style="font-size:11px">refresh</span></div><div class="icon-btn" onclick="deleteKey(${k.id})" title="Delete"><span class="ms" style="font-size:11px">delete</span></div></div>`).join('');document.getElementById('st-keys').textContent=d.keys.length;}catch(e){}
+}
+async function createKey(){const name=document.getElementById('new-key-name').value.trim()||'API Key';const perms=document.getElementById('new-key-perms').value;const exp=document.getElementById('new-key-expires').value;try{const r=await fetch(`${API}/api/keys/create`,{method:'POST',headers:H(),body:JSON.stringify({name,permissions:perms,expires_days:exp||null})});const d=await r.json();if(!r.ok){showToast(d.error||'Failed','error');return;}showToast('Key created!','success');openKeysModal();}catch(e){showToast('Error','error');}}
+async function deleteKey(id){if(!confirm('Delete this API key?'))return;try{await fetch(`${API}/api/keys/delete`,{method:'DELETE',headers:H(),body:JSON.stringify({key_id:id})});showToast('Key deleted','error');openKeysModal();}catch(e){showToast('Error','error');}}
+async function rotateKey(id){if(!confirm('Rotate this key? The old key will stop working.'))return;try{const r=await fetch(`${API}/api/keys/rotate`,{method:'PATCH',headers:H(),body:JSON.stringify({key_id:id})});const d=await r.json();if(!r.ok){showToast('Failed','error');return;}showToast('Key rotated!','success');openKeysModal();}catch(e){showToast('Error','error');}}
+
+// APP USERS
+async function openAppUsersModal(){
+  openModal('modal-appusers');
+  try{
+    const kr=await fetch(`${API}/api/keys/list`,{headers:H()});const kd=await kr.json();
+    if(!kd.keys?.length){document.getElementById('appusers-list').innerHTML='<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:14px">Create an API key first</div>';return;}
+    const key=kd.keys[0].api_key;
+    const r=await fetch(`${API}/api/data/appusers`,{headers:{...H(),'X-Api-Key':key}});
+    const d=await r.json();
+    const users=d.users||[];
+    document.getElementById('appusers-count').textContent=users.length;
+    if(!users.length){document.getElementById('appusers-list').innerHTML='<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:14px">No app users yet</div>';return;}
+    document.getElementById('appusers-list').innerHTML=users.map(u=>`<div class="appuser-item"><div class="avatar" style="width:28px;height:28px;font-size:11px">${u.name[0].toUpperCase()}</div><div style="flex:1;overflow:hidden"><div style="font-size:13px;font-weight:500">${u.name}</div><div style="font-size:11px;color:var(--muted)">${u.email}</div></div><span class="role-badge role-${u.role}">${u.role}</span>${u.is_banned?'<span style="font-size:10px;color:var(--danger)">BANNED</span>':''}<select onchange="setAppUserRole(${u.id},'${key}',this.value)" style="font-size:11px;padding:3px 6px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);outline:none"><option value="">Role</option><option value="admin">Admin</option><option value="editor">Editor</option><option value="user">User</option></select><div class="icon-btn" onclick="toggleBanAppUser(${u.id},'${key}',${u.is_banned})" title="${u.is_banned?'Unban':'Ban'}"><span class="ms" style="font-size:11px">${u.is_banned?'check_circle':'block'}</span></div><div class="icon-btn" onclick="deleteAppUser(${u.id},'${key}')" title="Delete"><span class="ms" style="font-size:11px">delete</span></div></div>`).join('');
+  }catch(e){document.getElementById('appusers-list').innerHTML='<div style="color:var(--muted);font-size:12.5px;padding:14px">Error loading</div>';}
+}
+async function setAppUserRole(uid,key,role){if(!role)return;try{await fetch(`${API}/api/data/appusers`,{method:'POST',headers:{...H(),'X-Api-Key':key},body:JSON.stringify({act:'setrole',user_id:uid,role})});showToast('Role updated','success');openAppUsersModal();}catch(e){}}
+async function toggleBanAppUser(uid,key,isBanned){try{await fetch(`${API}/api/data/appusers`,{method:'POST',headers:{...H(),'X-Api-Key':key},body:JSON.stringify({act:isBanned?'unban':'ban',user_id:uid})});showToast(isBanned?'User unbanned':'User banned','info');openAppUsersModal();}catch(e){}}
+async function deleteAppUser(uid,key){if(!confirm('Delete this app user?'))return;try{await fetch(`${API}/api/data/appusers`,{method:'POST',headers:{...H(),'X-Api-Key':key},body:JSON.stringify({act:'delete',user_id:uid})});showToast('Deleted','error');openAppUsersModal();}catch(e){}}
+
+// WEBHOOKS
+async function openWebhooksModal(){
+  const sel=document.getElementById('wh-table');sel.innerHTML='<option value="">Select table...</option>'+tables.map(t=>`<option value="${t.table_name}">${t.table_name}</option>`).join('');
+  openModal('modal-webhooks');
+  try{
+    const kr=await fetch(`${API}/api/keys/list`,{headers:H()});const kd=await kr.json();
+    if(!kd.keys?.length){document.getElementById('webhooks-list').innerHTML='<div style="color:var(--muted);font-size:12.5px;padding:14px">Create an API key first</div>';return;}
+    const key=kd.keys[0].api_key;
+    const r=await fetch(`${API}/api/data/webhooks`,{headers:{...H(),'X-Api-Key':key}});
+    const d=await r.json();
+    const hooks=d.webhooks||[];
+    if(!hooks.length){document.getElementById('webhooks-list').innerHTML='<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:14px">No webhooks yet</div>';return;}
+    document.getElementById('webhooks-list').innerHTML=hooks.map(h=>`<div class="webhook-item"><div style="flex:1;overflow:hidden"><div style="font-size:12px;font-weight:600;font-family:var(--mono)">${h.table_name}</div><div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.url}</div><div style="font-size:10px;color:var(--accent);margin-top:2px">${h.events}</div></div><div class="icon-btn" onclick="deleteWebhook(${h.id},'${key}')"><span class="ms" style="font-size:11px">delete</span></div></div>`).join('');
+  }catch(e){}
+}
+async function createWebhook(){const tbl=document.getElementById('wh-table').value;const url=document.getElementById('wh-url').value.trim();const events=document.getElementById('wh-events').value;if(!tbl||!url){showToast('Table and URL required','error');return;}try{const kr=await fetch(`${API}/api/keys/list`,{headers:H()});const kd=await kr.json();if(!kd.keys?.length){showToast('Create API key first','error');return;}const key=kd.keys[0].api_key;const r=await fetch(`${API}/api/data/webhooks`,{method:'POST',headers:{...H(),'X-Api-Key':key},body:JSON.stringify({table_name:tbl,url,events})});if(!r.ok){showToast('Failed','error');return;}showToast('Webhook added!','success');openWebhooksModal();}catch(e){showToast('Error','error');}}
+async function deleteWebhook(id,key){if(!confirm('Delete webhook?'))return;try{await fetch(`${API}/api/data/webhooks`,{method:'DELETE',headers:{...H(),'X-Api-Key':key},body:JSON.stringify({webhook_id:id})});showToast('Deleted','error');openWebhooksModal();}catch(e){}}
+
+// USAGE STATS
+async function openUsageModal(){
+  openModal('modal-usage');
+  try{
+    const kr=await fetch(`${API}/api/keys/list`,{headers:H()});const kd=await kr.json();
+    if(!kd.keys?.length){document.getElementById('usage-body').innerHTML='<div style="color:var(--muted);padding:14px">Create an API key first</div>';return;}
+    const key=kd.keys[0].api_key;
+    const r=await fetch(`${API}/api/data/usage`,{headers:{...H(),'X-Api-Key':key}});
+    const d=await r.json();
+    const stats=d.stats||[];const daily=d.daily||[];
+    const maxCalls=Math.max(...daily.map(d=>parseInt(d.calls)||0),1);
+    document.getElementById('usage-body').innerHTML=`
+      <div style="margin-bottom:16px">
+        <div class="chart-title">Daily API Calls (Last 30 days)</div>
+        ${daily.length?`<div class="bar-chart">${daily.map(d=>`<div class="bar" style="height:${Math.max(8,Math.round((parseInt(d.calls)/maxCalls)*100))}%" title="${d.date}: ${d.calls} calls"><span class="bar-label">${new Date(d.date).getDate()}</span></div>`).join('')}</div>`:'<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No usage data yet</div>'}
+      </div>
+      <div>
+        <div class="chart-title">Endpoint Breakdown</div>
+        ${stats.length?stats.map(s=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 10px;background:var(--s2);border-radius:7px;margin-bottom:5px"><span style="font-family:var(--mono);font-size:11px;color:var(--accent2);width:55px">${s.method}</span><span style="flex:1;font-family:var(--mono);font-size:11px">${s.endpoint}</span><span style="font-family:var(--mono);font-size:12px;font-weight:700">${s.calls}</span><span style="font-size:11px;color:var(--muted)">${Math.round(s.avg_ms||0)}ms</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px;text-align:center;padding:14px">No data yet</div>'}
+      </div>`;
+  }catch(e){document.getElementById('usage-body').innerHTML='<div style="color:var(--muted);padding:14px">Error loading stats</div>';}
+}
+
+// PLANS
+async function openPlansModal(){
+  openModal('modal-plans');
+  try{const r=await fetch(`${API}/api/plans`);const d=await r.json();const plans=d.plans||[];const payment=(await (await fetch(`${API}/api/admin/settings`)).json()).payment_enabled==='true';document.getElementById('plans-body').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">${plans.map(p=>`<div style="background:var(--s2);border:2px solid ${user.plan===p.name?'var(--accent)':'var(--border)'};border-radius:12px;padding:16px;text-align:center"><div style="font-family:var(--mono);font-size:13px;font-weight:700;text-transform:uppercase;margin-bottom:4px">${p.name}</div><div style="font-size:22px;font-weight:700;margin-bottom:8px">${p.price==0?'Free':'$'+p.price}<span style="font-size:11px;color:var(--muted)">/mo</span></div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">✓ ${p.max_tables} tables</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">✓ ${p.max_rows_per_table?.toLocaleString()} rows/table</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">✓ ${p.max_api_keys} API keys</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">✓ ${p.max_app_users} app users</div>${p.csv_export?'<div style="font-size:11px;color:var(--accent2);margin-bottom:4px">✓ CSV Export</div>':''}${p.webhooks?'<div style="font-size:11px;color:var(--accent2);margin-bottom:4px">✓ Webhooks</div>':''}<div style="margin-top:10px">${user.plan===p.name?`<div style="font-size:11px;color:var(--accent);font-weight:600">Current Plan</div>`:`${payment&&p.price>0?`<button class="btn btn-primary" style="width:100%;justify-content:center;font-size:12px">Upgrade</button>`:`<div style="font-size:10px;color:var(--muted)">Contact admin to upgrade</div>`}`}</div></div>`).join('')}</div>`;}catch(e){document.getElementById('plans-body').innerHTML='<div style="color:var(--muted);padding:14px">Error loading plans</div>';}
+}
+
+// PROFILE
+async function openProfileModal(){
+  document.getElementById('profile-name').value=user.name||'';
+  document.getElementById('profile-email').value=user.email||'';
+  document.getElementById('profile-plan').value=(user.plan||'free').charAt(0).toUpperCase()+(user.plan||'free').slice(1);
+  openModal('modal-profile');
+}
+async function saveProfile(){const name=document.getElementById('profile-name').value.trim();try{const r=await fetch(`${API}/api/auth/profile`,{method:'PUT',headers:H(),body:JSON.stringify({name})});if(!r.ok){showToast('Failed','error');return;}user.name=name;localStorage.setItem('tb_user',JSON.stringify(user));document.getElementById('sb-name').textContent=name;document.getElementById('sb-avatar').textContent=name[0].toUpperCase();closeModal('modal-profile');showToast('Profile updated!','success');}catch(e){showToast('Error','error');}}
+
+// MODAL
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+// TOAST
+function showToast(msg,type='success'){const wrap=document.getElementById('toast-wrap');const el=document.createElement('div');el.className=`toast ${type}`;el.innerHTML=`<span class="ms" style="font-size:15px">${type==='success'?'check_circle':type==='error'?'error':'info'}</span> ${msg}`;wrap.appendChild(el);setTimeout(()=>el.classList.add('show'),10);setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},2800);}
+
+
+// ===== TEMPLATES =====
+async function openTemplatesModal(){
+  openModal('modal-templates');
+  const grid=document.getElementById('templates-grid');
+  grid.innerHTML='<div style="color:var(--muted);font-size:12.5px;grid-column:1/-1;text-align:center;padding:20px">Loading...</div>';
+  try{
+    const r=await fetch(`${API}/api/tables/templates`);
+    const d=await r.json();
+    grid.innerHTML=(d.templates||[]).map(t=>`
+      <div style="background:var(--s2);border:2px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all 0.2s" onclick="applyTemplate('${t.key}','${t.name}')" onmouseover="this.style.borderColor='${t.color}'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+          <div style="width:32px;height:32px;border-radius:8px;background:${t.color}20;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span class="ms" style="font-size:17px;color:${t.color}">${t.icon}</span>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:12px;font-weight:700">${t.name}</div>
+            <div style="font-size:10px;color:var(--muted)">${t.table_count} tables</div>
+          </div>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:7px">${t.description}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px">
+          ${(t.tables||[]).map(tb=>`<span style="font-size:9px;padding:1px 5px;border-radius:8px;background:${tb.type==='collection'?'rgba(62,207,142,0.15)':'rgba(99,102,241,0.12)'};color:${tb.type==='collection'?'var(--accent2)':'var(--accent)'};font-family:var(--mono)">${tb.name}</span>`).join('')}
+        </div>
+      </div>`).join('');
+  }catch(e){grid.innerHTML='<div style="color:var(--danger);padding:14px;grid-column:1/-1">Error loading templates</div>';}
+}
+
+async function applyTemplate(key,name){
+  if(!confirm(`Apply "${name}" template? All tables will be created.`))return;
+  const withSample=document.getElementById('tpl-sample')?.checked!==false;
+  closeModal('modal-templates');
+  showToast(`Applying ${name}...`,'info');
+  try{
+    const r=await fetch(`${API}/api/tables/apply_template`,{method:'POST',headers:H(),body:JSON.stringify({template_key:key,with_sample:withSample})});
+    const d=await r.json();
+    if(!r.ok){showToast(d.error||'Failed','error');return;}
+    const created=(d.results||[]).filter(r=>r.status==='created').length;
+    const skipped=(d.results||[]).filter(r=>r.status==='skipped').length;
+    await loadTables();
+    showToast(`${name}: ${created} created${skipped>0?', '+skipped+' skipped':''}!`,'success');
+    const first=(d.results||[]).find(r=>r.status==='created');
+    if(first)openTable(first.name);
+  }catch(e){showToast('Error','error');}
+}
+
+// ===== COLLECTION =====
+let colEditId=null;
+
+function openColInsertModal(){
+  document.getElementById('col-insert-data').value='{\n  \n}';
+  document.getElementById('json-err').style.display='none';
+  openModal('modal-col-insert');
+  setTimeout(()=>{const ta=document.getElementById('col-insert-data');ta.focus();ta.setSelectionRange(4,4);},150);
+}
+
+async function insertCollection(){
+  const raw=document.getElementById('col-insert-data').value.trim();
+  const errEl=document.getElementById('json-err');
+  let data;
+  try{data=JSON.parse(raw);errEl.style.display='none';}
+  catch(e){errEl.textContent='Invalid JSON: '+e.message;errEl.style.display='block';return;}
+  try{
+    const r=await fetch(`${API}/api/rows/insert`,{method:'POST',headers:H(),body:JSON.stringify({table:activeTbl,data})});
+    const d=await r.json();
+    if(!r.ok){showToast(d.error||'Failed','error');return;}
+    closeModal('modal-col-insert');await loadRows();loadTables();showToast('Document inserted!','success');
+  }catch(e){showToast('Error','error');}
+}
+
+function openColEditModal(id,data){
+  colEditId=id;
+  document.getElementById('col-edit-data').value=JSON.stringify(typeof data==='object'?data:{},null,2);
+  document.getElementById('col-replace-mode').checked=false;
+  openModal('modal-col-edit');
+}
+
+async function saveCollection(){
+  const raw=document.getElementById('col-edit-data').value.trim();
+  const merge=!document.getElementById('col-replace-mode').checked;
+  let data;
+  try{data=JSON.parse(raw);}
+  catch(e){showToast('Invalid JSON: '+e.message,'error');return;}
+  try{
+    const r=await fetch(`${API}/api/rows/update`,{method:'PUT',headers:H(),body:JSON.stringify({table:activeTbl,id:colEditId,data,merge})});
+    const d=await r.json();
+    if(!r.ok){showToast(d.error||'Failed','error');return;}
+    closeModal('modal-col-edit');await loadRows();showToast('Document updated!','success');
+  }catch(e){showToast('Error','error');}
+}
+
+// INIT
+loadSettings();
+loadTables();
+// Load API key count
+fetch(`${API}/api/keys/list`,{headers:H()}).then(r=>r.json()).then(d=>document.getElementById('st-keys').textContent=d.keys?.length||0).catch(()=>{});
+</script>
+</body>
+</html>

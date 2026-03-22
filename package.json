@@ -1,0 +1,10 @@
+{
+  "name": "datarix",
+  "version": "5.0.0",
+  "description": "Datarix - Cloud SQL Database Platform",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datarix — Cloud SQL Database</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+<style>
+:root{--bg:#07070d;--s1:#0f0f1a;--s2:#161624;--border:#1e1e30;--accent:#6366f1;--accent2:#3ecf8e;--danger:#f25f5c;--text:#e8e8f2;--muted:#52527a;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ms{font-family:'Material Symbols Outlined';font-size:20px;vertical-align:middle;font-weight:300;font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;-webkit-font-feature-settings:'liga';font-feature-settings:'liga';-webkit-font-smoothing:antialiased}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(99,102,241,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,0.1) 0%,transparent 70%);pointer-events:none}
+.wrap{position:relative;z-index:1;width:100%;max-width:400px;padding:20px}
+.lang-bar{display:flex;justify-content:center;gap:8px;margin-bottom:20px}
+.lang-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all 0.2s}
+.lang-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.logo-area{text-align:center;margin-bottom:28px;animation:fadeUp 0.5s ease}
+.logo-icon{width:58px;height:58px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 24px rgba(99,102,241,0.3)}
+.logo-text{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-1px}
+.logo-text span{color:var(--accent)}
+.logo-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:26px;animation:fadeUp 0.5s ease 0.1s both}
+.tabs{display:flex;background:var(--s2);border-radius:10px;padding:4px;margin-bottom:22px;gap:4px}
+.tab{flex:1;padding:9px;border-radius:7px;border:none;background:none;color:var(--muted);font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab .ms{font-size:16px}
+.tab.active{background:var(--accent);color:#fff}
+.fg{margin-bottom:14px}
+.fl{font-size:10.5px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+.input-wrap{position:relative}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:11px 14px 11px 42px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;transition:border-color 0.2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+.fi-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
+.btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14.5px;font-weight:600;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;margin-top:4px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(99,102,241,0.35)}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
+.err{background:rgba(242,95,92,0.1);border:1px solid rgba(242,95,92,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:14px;display:none;align-items:center;gap:8px}
+.err.show{display:flex}
+.support-line{text-align:center;margin-top:18px;font-size:12px;color:var(--muted)}
+.support-line a{color:var(--accent);text-decoration:none}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spinning 0.7s linear infinite}
+@keyframes spinning{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="wrap">
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('en')">🇬🇧 EN</button>
+    <button class="lang-btn" onclick="setLang('bn')">🇧🇩 বাংলা</button>
+    <button class="lang-btn" onclick="setLang('hi')">🇮🇳 हिंदी</button>
+  </div>
+  <div class="logo-area">
+    <div class="logo-icon"><span class="ms" style="color:#fff;font-size:28px">database</span></div>
+    <div class="logo-text">Data<span>rix</span></div>
+    <div class="logo-sub" id="t-sub">Cloud SQL Database Platform</div>
+  </div>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">
+        <span class="ms">login</span> <span id="t-login">Login</span>
+      </button>
+      <button class="tab" id="tab-reg" onclick="switchTab('reg')">
+        <span class="ms">person_add</span> <span id="t-register">Register</span>
+      </button>
+    </div>
+    <div class="err" id="err"><span class="ms" style="font-size:16px">error</span><span id="err-txt"></span></div>
+    <!-- LOGIN -->
+    <div id="f-login">
+      <div class="fg">
+        <label class="fl" id="t-email">Email</label>
+        <div class="input-wrap">
+          <span class="ms fi-icon">mail</span>
+          <input class="fi" id="l-email" type="email" placeholder="you@example.com">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" id="t-password">Password</label>
+        <div class="input-wrap">
+          <span class="ms fi-icon">lock</span>
+          <input class="fi" id="l-pass" type="password" placeholder="••••••••">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-login" onclick="doLogin()">
+        <span class="ms">login</span> <span id="t-signin">Sign In</span>
+      </button>
+    </div>
+    <!-- REGISTER -->
+    <div id="f-reg" style="display:none">
+      <div class="fg">
+        <label class="fl" id="t-name">Full Name</label>
+        <div class="input-wrap">
+          <span class="ms fi-icon">person</span>
+          <input class="fi" id="r-name" type="text" placeholder="Your full name">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" id="t-email2">Email</label>
+        <div class="input-wrap">
+          <span class="ms fi-icon">mail</span>
+          <input class="fi" id="r-email" type="email" placeholder="you@example.com">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" id="t-pass2">Password</label>
+        <div class="input-wrap">
+          <span class="ms fi-icon">lock</span>
+          <input class="fi" id="r-pass" type="password" placeholder="Min 6 characters">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-reg" onclick="doRegister()">
+        <span class="ms">person_add</span> <span id="t-createacc">Create Account</span>
+      </button>
+    </div>
+  </div>
+  <div class="support-line"><span id="t-need-help">Need help?</span> <a href="#" id="support-a" target="_blank"><span id="t-contact">Contact Support</span></a></div>
+</div>
+<script>
+// TRANSLATIONS
+const T = {
+  en: { sub:'Cloud SQL Database Platform', login:'Login', register:'Register', email:'Email', password:'Password', name:'Full Name', signin:'Sign In', createacc:'Create Account', needhelp:'Need help?', contact:'Contact Support', fillall:'Please fill all fields', min6:'Password must be at least 6 characters', loginfail:'Login failed', regfail:'Registration failed', neterr:'Network error. Please try again.' },
+  bn: { sub:'ক্লাউড এসকিউএল ডেটাবেস প্ল্যাটফর্ম', login:'লগইন', register:'রেজিস্টার', email:'ইমেইল', password:'পাসওয়ার্ড', name:'পূর্ণ নাম', signin:'সাইন ইন', createacc:'একাউন্ট তৈরি করুন', needhelp:'সাহায্য দরকার?', contact:'সাপোর্টে যোগাযোগ করুন', fillall:'সব ফিল্ড পূরণ করুন', min6:'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে', loginfail:'লগইন ব্যর্থ হয়েছে', regfail:'রেজিস্ট্রেশন ব্যর্থ হয়েছে', neterr:'নেটওয়ার্ক সমস্যা। আবার চেষ্টা করুন।' },
+  hi: { sub:'क्लाउड SQL डेटाबेस प्लेटफॉर्म', login:'लॉगिन', register:'रजिस्टर', email:'ईमेल', password:'पासवर्ड', name:'पूरा नाम', signin:'साइन इन', createacc:'अकाउंट बनाएं', needhelp:'मदद चाहिए?', contact:'सपोर्ट से संपर्क करें', fillall:'सभी फ़ील्ड भरें', min6:'पासवर्ड कम से कम 6 अक्षर का होना चाहिए', loginfail:'लॉगिन विफल', regfail:'पंजीकरण विफल', neterr:'नेटवर्क त्रुटि। पुनः प्रयास करें।' }
+};
+let lang = localStorage.getItem('datarix_lang') || 'en';
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('datarix_lang', l);
+  document.querySelectorAll('.lang-btn').forEach((b,i)=>{
+    b.className = 'lang-btn' + (['en','bn','hi'][i]===l?' active':'');
+  });
+  const t = T[l];
+  document.getElementById('t-sub').textContent = t.sub;
+  document.getElementById('t-login').textContent = t.login;
+  document.getElementById('t-register').textContent = t.register;
+  document.getElementById('t-email').textContent = t.email;
+  document.getElementById('t-email2').textContent = t.email;
+  document.getElementById('t-password').textContent = t.password;
+  document.getElementById('t-pass2').textContent = t.password;
+  document.getElementById('t-name').textContent = t.name;
+  document.getElementById('t-signin').textContent = t.signin;
+  document.getElementById('t-createacc').textContent = t.createacc;
+  document.getElementById('t-need-help').textContent = t.needhelp;
+  document.getElementById('t-contact').textContent = t.contact;
+}
+setLang(lang);
+
+if (localStorage.getItem('tb_token')) window.location.href = '/app';
+fetch('/api/admin/settings').then(r=>r.ok?r.json():{}).then(s=>{
+  if(s.support_link) document.getElementById('support-a').href=s.support_link;
+}).catch(()=>{});
+
+function switchTab(t) {
+  document.getElementById('f-login').style.display = t==='login'?'block':'none';
+  document.getElementById('f-reg').style.display = t==='reg'?'block':'none';
+  document.getElementById('tab-login').className = 'tab'+(t==='login'?' active':'');
+  document.getElementById('tab-reg').className = 'tab'+(t==='reg'?' active':'');
+  hideErr();
+}
+function showErr(m){document.getElementById('err-txt').textContent=m;document.getElementById('err').classList.add('show')}
+function hideErr(){document.getElementById('err').classList.remove('show')}
+
+async function doLogin(){
+  hideErr();
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  if(!email||!pass){showErr(T[lang].fillall);return;}
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true;btn.innerHTML='<div class="spin"></div>';
+  try{
+    const r=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const d=await r.json();
+    if(!r.ok){showErr(d.error||T[lang].loginfail);}
+    else{localStorage.setItem('tb_token',d.token);localStorage.setItem('tb_user',JSON.stringify(d.user));window.location.href=d.user.is_admin?'/admin':'/app';return;}
+  }catch(e){showErr(T[lang].neterr);}
+  btn.disabled=false;btn.innerHTML=`<span class="ms">login</span> ${T[lang].signin}`;
+}
+
+async function doRegister(){
+  hideErr();
+  const name=document.getElementById('r-name').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const pass=document.getElementById('r-pass').value;
+  if(!name||!email||!pass){showErr(T[lang].fillall);return;}
+  if(pass.length<6){showErr(T[lang].min6);return;}
+  const btn=document.getElementById('btn-reg');
+  btn.disabled=true;btn.innerHTML='<div class="spin"></div>';
+  try{
+    const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pass})});
+    const d=await r.json();
+    if(!r.ok){showErr(d.error||T[lang].regfail);}
+    else{localStorage.setItem('tb_token',d.token);localStorage.setItem('tb_user',JSON.stringify(d.user));window.location.href='/app';return;}
+  }catch(e){showErr(T[lang].neterr);}
+  btn.disabled=false;btn.innerHTML=`<span class="ms">person_add</span> ${T[lang].createacc}`;
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){if(document.getElementById('f-login').style.display!=='none')doLogin();else doRegister();}});
+</script>
+</body>
+</html>
